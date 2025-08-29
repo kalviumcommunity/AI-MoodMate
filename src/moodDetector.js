@@ -7,7 +7,7 @@ const openai = new OpenAI({
 });
 
 /**
- * Detects the mood from the user's text using a zero-shot prompt.
+ * Detects the mood from the user's text using a ONE-SHOT prompt.
  * @param {string} text - The user's input text.
  * @returns {Promise<string>} The detected mood (e.g., 'happy', 'sad').
  */
@@ -18,26 +18,37 @@ export async function detectMood(text) {
       messages: [
         {
           role: "system",
-          // This is the core of the prompt engineering (RTFC Framework)
+          // The system prompt remains the same
           content: "You are an expert in emotion detection. Classify the mood of the user's text into one of the following categories: happy, sad, stressed, angry, excited. Respond with only the single-word mood."
         },
+        
+        // --- ONE-SHOT EXAMPLE ---
+        // We provide one complete example to guide the model.
         {
           role: "user",
-          // We insert the user's text here without giving any examples
+          content: "I feel so down after failing my test." // Example Input
+        },
+        {
+          role: "assistant",
+          content: "sad" // Example Output
+        },
+        // --- END OF EXAMPLE ---
+
+        {
+          role: "user",
+          // This is the actual user input we want to classify
           content: `Classify the mood in this sentence: '${text}'`
         }
       ],
-      temperature: 0.2, // Low temperature for factual, predictable classification
-      max_tokens: 10    // Limit the response to a few tokens
+      temperature: 0.1, // Even lower temperature as we've given a strong hint
+      max_tokens: 10
     });
 
-    // Extract the mood from the response, trim whitespace, and convert to lowercase
     const mood = response.choices[0].message.content.trim().toLowerCase();
     return mood;
 
   } catch (error) {
-    // Handle potential API errors gracefully
     console.error("Error detecting mood:", error);
-    return "neutral"; // Return a default mood on error
+    return "neutral";
   }
 }
