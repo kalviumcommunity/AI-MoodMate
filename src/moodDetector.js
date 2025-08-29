@@ -6,11 +6,7 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-/**
- * Detects the mood from the user's text using a CHAIN-OF-THOUGHT prompt.
- * @param {string} text - The user's input text.
- * @returns {Promise<string>} The detected mood (e.g., 'happy', 'sad').
- */
+
 export async function detectMood(text) {
   try {
     const response = await openai.chat.completions.create({
@@ -22,6 +18,7 @@ export async function detectMood(text) {
           content: "You are an expert in emotion detection. First, explain your reasoning in a 'Reasoning:' section. Then, provide the final classification on a new line as 'Final Mood: [mood]'. The possible moods are: happy, sad, stressed, angry, excited."
         },
         
+
         // --- CHAIN-OF-THOUGHT EXAMPLES ---
         // The examples now include the reasoning process.
         {
@@ -39,6 +36,33 @@ export async function detectMood(text) {
         {
           role: "assistant",
           content: "Reasoning: The user mentions multiple exams, lack of preparation, and the feeling of being 'overwhelmed.' This points directly to a state of stress.\nFinal Mood: stressed"
+=======
+        // --- MULTI-SHOT EXAMPLES ---
+        // We provide several diverse examples to guide the model.
+        {
+          role: "user",
+          content: "I just won my football match, I'm so thrilled!" // Example 1
+        },
+        {
+          role: "assistant",
+          content: "happy"
+        },
+        {
+          role: "user",
+          content: "I have three exams tomorrow and I haven't started studying. I'm so overwhelmed." // Example 2
+        },
+        {
+          role: "assistant",
+          content: "stressed"
+        },
+        {
+          role: "user",
+          content: "I feel so down after failing my test." // Example 3
+        },
+        {
+          role: "assistant",
+          content: "sad"
+
         },
         // --- END OF EXAMPLES ---
 
@@ -48,8 +72,7 @@ export async function detectMood(text) {
           content: `Classify the mood in this sentence: '${text}'`
         }
       ],
-      temperature: 0.1,
-      max_tokens: 100 // Increased max_tokens to allow for reasoning
+
     });
 
     const fullResponse = response.choices[0].message.content;
