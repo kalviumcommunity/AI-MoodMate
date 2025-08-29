@@ -7,7 +7,7 @@ const openai = new OpenAI({
 });
 
 /**
- * Detects the mood from the user's text using a ONE-SHOT prompt.
+ * Detects the mood from the user's text using a MULTI-SHOT prompt.
  * @param {string} text - The user's input text.
  * @returns {Promise<string>} The detected mood (e.g., 'happy', 'sad').
  */
@@ -22,17 +22,33 @@ export async function detectMood(text) {
           content: "You are an expert in emotion detection. Classify the mood of the user's text into one of the following categories: happy, sad, stressed, angry, excited. Respond with only the single-word mood."
         },
         
-        // --- ONE-SHOT EXAMPLE ---
-        // We provide one complete example to guide the model.
+        // --- MULTI-SHOT EXAMPLES ---
+        // We provide several diverse examples to guide the model.
         {
           role: "user",
-          content: "I feel so down after failing my test." // Example Input
+          content: "I just won my football match, I'm so thrilled!" // Example 1
         },
         {
           role: "assistant",
-          content: "sad" // Example Output
+          content: "happy"
         },
-        // --- END OF EXAMPLE ---
+        {
+          role: "user",
+          content: "I have three exams tomorrow and I haven't started studying. I'm so overwhelmed." // Example 2
+        },
+        {
+          role: "assistant",
+          content: "stressed"
+        },
+        {
+          role: "user",
+          content: "I feel so down after failing my test." // Example 3
+        },
+        {
+          role: "assistant",
+          content: "sad"
+        },
+        // --- END OF EXAMPLES ---
 
         {
           role: "user",
@@ -40,7 +56,7 @@ export async function detectMood(text) {
           content: `Classify the mood in this sentence: '${text}'`
         }
       ],
-      temperature: 0.1, // Even lower temperature as we've given a strong hint
+      temperature: 0.1, // Keep temperature low for high consistency
       max_tokens: 10
     });
 
