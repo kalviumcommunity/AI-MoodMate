@@ -1,0 +1,23 @@
+{
+  "name": "ai-moodmate-js",
+  "version": "1.0.0",
+  "description": "An emotion-based content recommender built with Node.js and OpenAI.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "openai",
+    "chatbot"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "openai": "^4.20.1",
+    "readline-sync": "^1.4.10"
+  }
+}
