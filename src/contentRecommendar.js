@@ -1,23 +1,22 @@
 import fs from 'fs';
 import path from 'path';
-import OpenAI from 'openai'; // <-- IMPORT OPENAI
-import { OPENAI_API_KEY } from './config.js'; // <-- IMPORT API KEY
 
-// Initialize OpenAI client for this module
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-});
-
-// --- This function remains the same ---
+// Load the dataset once when the module is imported
 const datasetPath = path.join(process.cwd(), 'data', 'content_dataset.json');
 const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf-8'));
 
+/**
+ * This is our "tool". It takes a mood and returns a content recommendation.
+ * @param {string} mood - The detected mood (e.g., 'happy', 'sad').
+ * @returns {object} A recommendation object.
+ */
 export function recommendContent(mood) {
-  // ... (no changes to this function's code)
+  console.log(`[Function Called] recommendContent with mood: ${mood}`);
+
   if (!dataset[mood]) {
     return {
       mood: "neutral",
-      suggestion: "I'm not sure how to respond to that, but I hope you have a great day!",
+      suggestion: "I couldn't find a specific recommendation, but I hope you have a great day!",
       content_type: "text",
       source: "AI MoodMate"
     };
@@ -57,36 +56,4 @@ export function recommendContent(mood) {
     content_type: randomContentType,
     source: source
   };
-}
-
-// --- NEW DYNAMIC FUNCTION ---
-/**
- * Generates a personalized, supportive message using a dynamic prompt.
- * @param {string} mood - The user's detected mood.
- * @returns {Promise<string>} A unique, AI-generated message.
- */
-export async function generateDynamicMessage(mood) {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are AI MoodMate, a friendly and supportive companion. Write a short, single-sentence, encouraging message for the user."
-        },
-        {
-          role: "user",
-          // This is the DYNAMIC part of the prompt.
-          // The content changes based on the 'mood' variable.
-          content: `The user is feeling ${mood}. What's a nice thing to say to them?`
-        }
-      ],
-      temperature: 0.8, // Higher temperature for more creative and varied responses
-      max_tokens: 60
-    });
-    return response.choices[0].message.content.trim();
-  } catch (error) {
-    console.error("Error generating dynamic message:", error);
-    return "Remember to be kind to yourself today."; // Fallback message
-  }
 }
