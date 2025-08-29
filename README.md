@@ -65,3 +65,28 @@ A more advanced implementation would use **Structured Output** or **Function Cal
   "function": "fetch_content",
   "arguments": {"mood": "happy", "type": "song"}
 }
+## 🔹 Tokens & Tokenization
+
+Underpinning every interaction with a Large Language Model is the concept of tokens. Understanding them is essential for managing costs, performance, and prompt design.
+
+### What are Tokens?
+
+A token is the basic unit of text that an LLM processes. It is not a word. A token can be a whole word, a part of a word (like a prefix or suffix), a single character, or a punctuation mark.
+
+For example, the sentence `I feel very happy!` might be tokenized into:
+`["I", " feel", " very", " happy", "!"]` (5 tokens)
+
+A more complex sentence like `Tokenization is important!` might become:
+`["Token", "ization", " is", " import", "ant", "!"]` (6 tokens)
+
+The exact tokenization depends on the model's specific vocabulary and algorithm.
+
+### Why is this Important for AI MoodMate?
+
+1.  **API Costs:** The primary way LLM providers like OpenAI charge for API usage is **per token**. This includes both the tokens you send in the prompt (input tokens) and the tokens the model generates in its response (output tokens). Our multi-shot and Chain-of-Thought prompts use more tokens than the simple zero-shot prompt, making them more expensive per call.
+
+2.  **Context Window:** Every model has a maximum number of tokens it can process in a single request, known as the "context window" (e.g., 4,096 tokens for gpt-3.5-turbo). The sum of your input prompt and the `max_tokens` you set for the output cannot exceed this limit.
+
+3.  **Prompt Engineering:** Effective prompt engineering often involves conveying instructions as clearly as possible using the fewest number of tokens to save costs and stay within the context window.
+
+4.  **Controlling Output:** The `max_tokens` parameter in our API calls is a direct constraint on the length of the generated response, which is crucial for getting concise outputs like a single-word mood.
