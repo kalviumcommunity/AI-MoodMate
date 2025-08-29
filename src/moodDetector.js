@@ -7,7 +7,7 @@ const openai = new OpenAI({
 });
 
 /**
- * Detects the mood from the user's text using a ONE-SHOT prompt.
+ * Detects the mood from the user's text using a CHAIN-OF-THOUGHT prompt.
  * @param {string} text - The user's input text.
  * @returns {Promise<string>} The detected mood (e.g., 'happy', 'sad').
  */
@@ -18,21 +18,29 @@ export async function detectMood(text) {
       messages: [
         {
           role: "system",
-          // The system prompt remains the same
-          content: "You are an expert in emotion detection. Classify the mood of the user's text into one of the following categories: happy, sad, stressed, angry, excited. Respond with only the single-word mood."
+          // The system prompt is updated to require a chain of thought.
+          content: "You are an expert in emotion detection. First, explain your reasoning in a 'Reasoning:' section. Then, provide the final classification on a new line as 'Final Mood: [mood]'. The possible moods are: happy, sad, stressed, angry, excited."
         },
         
-        // --- ONE-SHOT EXAMPLE ---
-        // We provide one complete example to guide the model.
+        // --- CHAIN-OF-THOUGHT EXAMPLES ---
+        // The examples now include the reasoning process.
         {
           role: "user",
-          content: "I feel so down after failing my test." // Example Input
+          content: "I just won my football match, I'm so thrilled!"
         },
         {
           role: "assistant",
-          content: "sad" // Example Output
+          content: "Reasoning: The user mentions winning a match and uses the word 'thrilled,' which are strong indicators of excitement and happiness.\nFinal Mood: happy"
         },
-        // --- END OF EXAMPLE ---
+        {
+          role: "user",
+          content: "I have three exams tomorrow and I haven't started studying. I'm so overwhelmed."
+        },
+        {
+          role: "assistant",
+          content: "Reasoning: The user mentions multiple exams, lack of preparation, and the feeling of being 'overwhelmed.' This points directly to a state of stress.\nFinal Mood: stressed"
+        },
+        // --- END OF EXAMPLES ---
 
         {
           role: "user",
@@ -40,12 +48,23 @@ export async function detectMood(text) {
           content: `Classify the mood in this sentence: '${text}'`
         }
       ],
-      temperature: 0.1, // Even lower temperature as we've given a strong hint
-      max_tokens: 10
+      temperature: 0.1,
+      max_tokens: 100 // Increased max_tokens to allow for reasoning
     });
 
-    const mood = response.choices[0].message.content.trim().toLowerCase();
-    return mood;
+    const fullResponse = response.choices[0].message.content;
+
+    // --- PARSING LOGIC ---
+    // We now need to parse the final mood from the full response.
+    const moodLine = fullResponse.split('\n').find(line => line.startsWith("Final Mood:"));
+    
+    if (moodLine) {
+      const mood = moodLine.split(":")[1].trim().toLowerCase();
+      return mood;
+    } else {
+      // Fallback in case the model doesn't follow the format perfectly
+      return "neutral";
+    }
 
   } catch (error) {
     console.error("Error detecting mood:", error);
