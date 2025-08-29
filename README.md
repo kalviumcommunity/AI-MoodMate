@@ -2,7 +2,7 @@
 
 AI MoodMate is a Generative AI-powered companion built with Node.js that understands a user’s mood from their text and provides personalized suggestions such as motivational quotes, songs, movies, and fun activities.
 
-## 🔹 Project Overview
+## 🔹 Project Overvieww
 
 This project demonstrates core LLM concepts and their application in a real-world scenario. It is designed to be an emotion-aware AI companion that tailors responses based on the user's expressed mood, moving beyond generic chatbot interactions.
 
